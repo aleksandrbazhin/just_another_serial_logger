@@ -109,8 +109,9 @@ void MainWindow::readData()
             this->data_to_save += header;
             this->data_header_received = true;
         }
-        QString msec = QString::number(
-                    QDateTime::currentMSecsSinceEpoch() - this->recording_start_time);
+        QString msec = QString::number((
+                    QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0);
+
         this->ui->timePlainTextEdit->appendPlainText(msec);
 
         QString row = msec + ",";
@@ -147,8 +148,8 @@ void MainWindow::startStopRecording()
 
         this->recording_started = false;
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
-                                   "test",
-                                   tr("CSV (*.сsv)"));
+                                   "experiment",
+                                   tr("CSV as .txt (*.txt)"));
         if (!fileName.isEmpty()) {
             QFile file(fileName);
             if (!file.open(QIODevice::WriteOnly)) {
