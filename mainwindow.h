@@ -32,6 +32,7 @@ private:
     bool recording_started = false;
     qint64 recording_start_time = 0;
     bool data_header_received = false;
+    QString temp_receive = "";
     QString data_to_save = "";
 
 };
