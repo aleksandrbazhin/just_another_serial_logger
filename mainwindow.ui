@@ -27,19 +27,6 @@
      <string>Connect</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="portLineEdit">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>151</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>COM3</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="portLabel">
     <property name="geometry">
      <rect>
@@ -67,25 +54,6 @@
     </property>
     <property name="text">
      <string>Start record</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="baudLineEdit">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>230</y>
-      <width>151</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>9600</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="baudLabel">
@@ -170,6 +138,9 @@
     <property name="undoRedoEnabled">
      <bool>false</bool>
     </property>
+    <property name="lineWrapMode">
+     <enum>QPlainTextEdit::NoWrap</enum>
+    </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
@@ -177,7 +148,7 @@
      <bool>false</bool>
     </property>
     <property name="textInteractionFlags">
-     <set>Qt::TextSelectableByKeyboard</set>
+     <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="timePlainTextEdit">
@@ -277,6 +248,16 @@
       <string>115200</string>
      </property>
     </item>
+   </widget>
+   <widget class="QComboBox" name="portComboBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>

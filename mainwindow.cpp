@@ -3,16 +3,22 @@
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSysInfo>
+#include <QSerialPortInfo>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     serial(new QSerialPort(this))
 {
-    ui->setupUi(this);
+    this->ui->setupUi(this);
+
+    foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
+        this->ui->portComboBox->addItem(serialPortInfo.portName());
+    }
 
     connect(this->ui->connectButton, &QPushButton::pressed, this, &MainWindow::handleConnectButton);
-    connect(this->ui->recordButton, &QPushButton::pressed, this, &MainWindow::startRecording);
+    connect(this->ui->recordButton, &QPushButton::pressed, this, &MainWindow::startStopRecording);
     connect(this->serial, &QSerialPort::readyRead, this, &MainWindow::readData);
 }
 
@@ -36,12 +42,14 @@ void MainWindow::handleConnectButton()
 //        this->ui->sendLineEdit->setEnabled(false);
         this->closeSerialPort();
         this->ui->recordButton->setEnabled(false);
+        this->recording_started = false;
+        this->resetRecording();
     }
 }
 
 bool MainWindow::openSerialPort()
 {
-    this->serial->setPortName(this->ui->portLineEdit->text());
+    this->serial->setPortName(this->ui->portComboBox->currentText());
     this->serial->setBaudRate(this->ui->baudComboBox->currentText().toInt());
     this->serial->setDataBits(QSerialPort::Data8);
     this->serial->setParity(QSerialPort::NoParity);
@@ -69,20 +77,24 @@ void MainWindow::readData()
 //    QByteArray data = this->serial->readAll();
 
 
-    this->ui->dataPlainTextEdit->insertPlainText(data);
+
+
+    QString data_string(data);
+    if (!data_string.endsWith("\n")) {
+        this->temp_receive.append(data_string);
+        return;
+    } else {
+        data_string.prepend(this->temp_receive);
+        this->temp_receive = "";
+    }
+
+    this->ui->dataPlainTextEdit->appendPlainText(data_string.trimmed());
     QScrollBar *bar = this->ui->dataPlainTextEdit->verticalScrollBar();
     bar->setValue(bar->maximum());
 
-    if (this->recording_started) {
-        QString data_string(data);
 
-        if (!data_string.endsWith("\n")) {
-            this->temp_receive.append(data_string);
-            return;
-        } else {
-            data_string.prepend(this->temp_receive);
-            this->temp_receive = "";
-        }
+    if (this->recording_started) {
+
 
         QStringList values = data_string.split(",");
         if (!this->data_header_received)  {
@@ -99,8 +111,7 @@ void MainWindow::readData()
         }
         QString msec = QString::number(
                     QDateTime::currentMSecsSinceEpoch() - this->recording_start_time);
-        this->ui->timePlainTextEdit->insertPlainText(msec);
-        this->ui->timePlainTextEdit->insertPlainText("\r\n");
+        this->ui->timePlainTextEdit->appendPlainText(msec);
 
         QString row = msec + ",";
         for (QString s: values) {
@@ -114,27 +125,30 @@ void MainWindow::readData()
     }
     QScrollBar *bar2 = this->ui->timePlainTextEdit->verticalScrollBar();
     bar2->setValue(bar2->maximum());
-
-
-
 }
 
-void MainWindow::startRecording()
+void MainWindow::resetRecording()
+{
+    this->data_to_save = "";
+    this->ui->recordButton->setText("Start record");
+
+    this->data_header_received = false;
+}
+
+void MainWindow::startStopRecording()
 {
     if (!this->recording_started) {
-        this->recording_started = true;
         this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
         this->ui->recordButton->setText("Stop and save");
         this->ui->dataPlainTextEdit->clear();
         this->ui->timePlainTextEdit->clear();
-
+        this->recording_started = true;
     } else {
+
         this->recording_started = false;
-        this->data_header_received = false;
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                                    "test",
                                    tr("CSV (*.сsv)"));
-
         if (!fileName.isEmpty()) {
             QFile file(fileName);
             if (!file.open(QIODevice::WriteOnly)) {
@@ -145,16 +159,10 @@ void MainWindow::startRecording()
             QDataStream out(&file);
             out << this->data_to_save.trimmed().toLatin1();
 
-        } else {
-            QMessageBox msgBox;
-            msgBox.setText("something happened");
-            msgBox.exec();
         }
-        this->data_to_save = "";
-        this->ui->recordButton->setText("Start record");
+        this->resetRecording();
     }
 }
-
 
 
 

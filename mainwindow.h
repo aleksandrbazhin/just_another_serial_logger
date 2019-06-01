@@ -25,7 +25,9 @@ private:
     bool openSerialPort();
     void closeSerialPort();
     void readData();
-    void startRecording();
+    void resetRecording();
+    void startStopRecording();
+
     Ui::MainWindow *ui;
     QSerialPort *serial = nullptr;
     bool serial_connected = false;
