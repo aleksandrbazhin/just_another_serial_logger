@@ -7,6 +7,7 @@
 #include <QString>
 #include <QStringList>
 #include <QDateTime>
+#include <QPlainTextEdit>
 
 namespace Ui {
 class MainWindow;
@@ -27,6 +28,7 @@ private:
     void readData();
     void resetRecording();
     void startStopRecording();
+    void appendRow(QPlainTextEdit *edit, const QString &text);
 
     Ui::MainWindow *ui;
     QSerialPort *serial = nullptr;
@@ -36,6 +38,7 @@ private:
     bool data_header_received = false;
     QString temp_receive = "";
     QString data_to_save = "";
+
 
 };
 

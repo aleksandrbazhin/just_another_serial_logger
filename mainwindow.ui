@@ -180,7 +180,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Time, msec</string>
+     <string>Time, sec</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">

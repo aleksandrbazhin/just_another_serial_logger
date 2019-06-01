@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QSysInfo>
 #include <QSerialPortInfo>
+#include <QTextStream>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -36,6 +37,9 @@ void MainWindow::handleConnectButton()
             this->serial_connected = true;
 //            this->ui->sendLineEdit->setEnabled(true);
             this->ui->recordButton->setEnabled(true);
+            this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
+            this->appendRow(this->ui->dataPlainTextEdit, "-------------connect--------------");
+            this->appendRow(this->ui->timePlainTextEdit, "-connect-");
         }
     } else {
         this->ui->connectButton->setText("Connect");
@@ -45,6 +49,8 @@ void MainWindow::handleConnectButton()
         this->ui->recordButton->setEnabled(false);
         this->recording_started = false;
         this->resetRecording();
+        this->appendRow(this->ui->dataPlainTextEdit, "------------disconnect--------------");
+        this->appendRow(this->ui->timePlainTextEdit, "-disconnect-");
     }
 }
 
@@ -75,11 +81,6 @@ void MainWindow::readData()
 {
     char data[256];
     this->serial->readLine(data, sizeof(data));
-//    QByteArray data = this->serial->readAll();
-
-
-
-
     QString data_string(data);
     if (!data_string.endsWith("\n")) {
         this->temp_receive.append(data_string);
@@ -89,16 +90,15 @@ void MainWindow::readData()
         this->temp_receive = "";
     }
 
-    this->ui->dataPlainTextEdit->appendPlainText(data_string.trimmed());
-    QScrollBar *bar = this->ui->dataPlainTextEdit->verticalScrollBar();
-    bar->setValue(bar->maximum());
-
+    QString msec = QString::number((
+                QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0);
 
     if (this->recording_started) {
-
-
         QStringList values = data_string.split(",");
         if (!this->data_header_received)  {
+            this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
+            msec = QString::number((
+                            QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0);
             QString header = "time,";
             for (QString s: values) {
                 QStringList data_el = s.trimmed().split(" ");
@@ -110,11 +110,6 @@ void MainWindow::readData()
             this->data_to_save += header;
             this->data_header_received = true;
         }
-        QString msec = QString::number((
-                    QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0);
-
-        this->ui->timePlainTextEdit->appendPlainText(msec);
-
         QString row = msec + ",";
         for (QString s: values) {
             QStringList data_el = s.trimmed().split(" ");
@@ -125,12 +120,14 @@ void MainWindow::readData()
         row += "\r\n";
         this->data_to_save += row;
     }
-    QScrollBar *bar2 = this->ui->timePlainTextEdit->verticalScrollBar();
-    bar2->setValue(bar2->maximum());
+
+    this->appendRow(this->ui->dataPlainTextEdit, data_string.trimmed());
+    this->appendRow(this->ui->timePlainTextEdit, msec);
 }
 
 void MainWindow::resetRecording()
 {
+    this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->data_to_save = "";
     this->ui->recordButton->setText("Start record");
 
@@ -140,13 +137,15 @@ void MainWindow::resetRecording()
 void MainWindow::startStopRecording()
 {
     if (!this->recording_started) {
-        this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
         this->ui->recordButton->setText("Stop and save");
         this->ui->dataPlainTextEdit->clear();
         this->ui->timePlainTextEdit->clear();
         this->recording_started = true;
+
     } else {
         this->recording_started = false;
+        this->appendRow(this->ui->dataPlainTextEdit, "-----------recording end-------------");
+        this->appendRow(this->ui->timePlainTextEdit, "-r end-");
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                                    "experiment",
                                    tr("CSV as .txt (*.txt)"));
@@ -163,6 +162,13 @@ void MainWindow::startStopRecording()
         }
         this->resetRecording();
     }
+}
+
+void MainWindow::appendRow(QPlainTextEdit *edit, const QString &text)
+{
+    edit->appendPlainText(text);
+    QScrollBar *bar = edit->verticalScrollBar();
+    bar->setValue(bar->maximum());
 }
 
 
