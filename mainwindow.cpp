@@ -42,8 +42,7 @@ void MainWindow::handleConnectButton()
 bool MainWindow::openSerialPort()
 {
     this->serial->setPortName(this->ui->portLineEdit->text());
-//    this->serial->setBaudRate(this->ui->baudLineEdit->text().toInt());
-    this->serial->setBaudRate(QSerialPort::Baud9600);
+    this->serial->setBaudRate(this->ui->baudComboBox->currentText().toInt());
     this->serial->setDataBits(QSerialPort::Data8);
     this->serial->setParity(QSerialPort::NoParity);
     this->serial->setStopBits(QSerialPort::OneStop);
@@ -69,12 +68,22 @@ void MainWindow::readData()
     this->serial->readLine(data, sizeof(data));
 //    QByteArray data = this->serial->readAll();
 
+
     this->ui->dataPlainTextEdit->insertPlainText(data);
     QScrollBar *bar = this->ui->dataPlainTextEdit->verticalScrollBar();
     bar->setValue(bar->maximum());
 
     if (this->recording_started) {
         QString data_string(data);
+
+        if (!data_string.endsWith("\n")) {
+            this->temp_receive.append(data_string);
+            return;
+        } else {
+            data_string.prepend(this->temp_receive);
+            this->temp_receive = "";
+        }
+
         QStringList values = data_string.split(",");
         if (!this->data_header_received)  {
             QString header = "time,";
