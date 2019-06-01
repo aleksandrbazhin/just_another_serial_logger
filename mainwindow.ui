@@ -208,6 +208,9 @@
     <property name="currentText">
      <string>9600</string>
     </property>
+    <property name="currentIndex">
+     <number>3</number>
+    </property>
     <item>
      <property name="text">
       <string>1200</string>
