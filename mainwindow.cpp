@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QSysInfo>
 #include <QSerialPortInfo>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -145,7 +146,6 @@ void MainWindow::startStopRecording()
         this->ui->timePlainTextEdit->clear();
         this->recording_started = true;
     } else {
-
         this->recording_started = false;
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                                    "experiment",
@@ -157,8 +157,8 @@ void MainWindow::startStopRecording()
                     file.errorString());
             }
 
-            QDataStream out(&file);
-            out << this->data_to_save.trimmed().toLatin1();
+            QTextStream out(&file);
+            out << this->data_to_save;
 
         }
         this->resetRecording();
