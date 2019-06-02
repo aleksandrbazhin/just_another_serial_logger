@@ -8,6 +8,8 @@
 #include <QStringList>
 #include <QDateTime>
 #include <QPlainTextEdit>
+#include <QVector>
+#include "datachart.h"
 
 namespace Ui {
 class MainWindow;
@@ -29,6 +31,13 @@ private:
     void resetRecording();
     void startStopRecording();
     void appendRow(QPlainTextEdit *edit, const QString &text);
+    void initChart();
+
+    QStringList getEntriesAt(const QString &data_string,
+                             int data_position = 1,
+                             int data_length = 2,
+                             QString data_sep = ",",
+                             QString entry_sep = " ");
 
     Ui::MainWindow *ui;
     QSerialPort *serial = nullptr;
@@ -38,7 +47,7 @@ private:
     bool data_header_received = false;
     QString temp_receive = "";
     QString data_to_save = "";
-
+    DataChart *datachart;
 
 };
 

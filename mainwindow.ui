@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>991</width>
-    <height>644</height>
+    <width>995</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="connectButton">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>340</x>
       <y>30</y>
       <width>111</width>
       <height>31</height>
@@ -46,21 +46,21 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>590</y>
+      <x>470</x>
+      <y>490</y>
       <width>101</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Start record</string>
+     <string>Start recording</string>
     </property>
    </widget>
    <widget class="QLabel" name="baudLabel">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>70</y>
+      <x>180</x>
+      <y>10</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -75,9 +75,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>470</x>
       <y>30</y>
-      <width>501</width>
+      <width>391</width>
       <height>31</height>
      </rect>
     </property>
@@ -104,7 +104,7 @@
    <widget class="QLabel" name="sendLabel">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>470</x>
       <y>10</y>
       <width>91</width>
       <height>16</height>
@@ -120,10 +120,10 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>590</x>
       <y>90</y>
-      <width>451</width>
-      <height>491</height>
+      <width>391</width>
+      <height>391</height>
      </rect>
     </property>
     <property name="font">
@@ -154,10 +154,10 @@
    <widget class="QPlainTextEdit" name="timePlainTextEdit">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>470</x>
       <y>89</y>
-      <width>171</width>
-      <height>491</height>
+      <width>101</width>
+      <height>391</height>
      </rect>
     </property>
     <property name="font">
@@ -167,13 +167,13 @@
      </font>
     </property>
     <property name="textInteractionFlags">
-     <set>Qt::TextSelectableByKeyboard</set>
+     <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
     </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>470</x>
       <y>70</y>
       <width>81</width>
       <height>16</height>
@@ -186,7 +186,7 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>590</x>
       <y>70</y>
       <width>47</width>
       <height>13</height>
@@ -199,8 +199,8 @@
    <widget class="QComboBox" name="baudComboBox">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>90</y>
+      <x>180</x>
+      <y>30</y>
       <width>151</width>
       <height>31</height>
      </rect>
@@ -262,10 +262,27 @@
      </rect>
     </property>
    </widget>
+   <widget class="QChartView" name="chartGraphicsView">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>431</width>
+      <height>391</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>QtCharts</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
