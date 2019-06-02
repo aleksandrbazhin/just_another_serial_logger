@@ -11,9 +11,11 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    serial(new QSerialPort(this))
+    serial(new QSerialPort(this)),
+    datachart(new DataChart)
 {
     this->ui->setupUi(this);
+    this->initChart();
 
     foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
         this->ui->portComboBox->addItem(serialPortInfo.portName());
@@ -50,7 +52,7 @@ void MainWindow::handleConnectButton()
         this->recording_started = false;
         this->resetRecording();
         this->appendRow(this->ui->dataPlainTextEdit, "------------disconnect--------------");
-        this->appendRow(this->ui->timePlainTextEdit, "-disconnect-");
+        this->appendRow(this->ui->timePlainTextEdit, "disconnect");
     }
 }
 
@@ -66,13 +68,11 @@ bool MainWindow::openSerialPort()
     } else {
         QMessageBox::critical(this, tr("Error"), this->serial->errorString());
         return false;
-
     }
 }
 
 void MainWindow::closeSerialPort()
 {
-
     if (this->serial->isOpen())
         this->serial->close();
 }
@@ -90,39 +90,27 @@ void MainWindow::readData()
         this->temp_receive = "";
     }
 
-    QString msec = QString::number((
-                QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0);
+    if (!this->data_header_received)  {
+        this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
+        QStringList received_headers = this->getEntriesAt(data_string, 0);
+        QString header = "time," + received_headers.join(",") + "\r\n";
+        this->data_to_save += header;
+        this->data_header_received = true;
+        this->datachart->initGraph(received_headers);
+    }
+
+    qreal time_sec =
+            (QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0;
+    QStringList received_values = this->getEntriesAt(data_string, 1);
 
     if (this->recording_started) {
-        QStringList values = data_string.split(",");
-        if (!this->data_header_received)  {
-            this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
-            msec = QString::number((
-                            QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0);
-            QString header = "time,";
-            for (QString s: values) {
-                QStringList data_el = s.trimmed().split(" ");
-                if (data_el.count() == 2) {
-                    header += data_el.at(0) + ",";
-                }
-            }
-            header += "\r\n";
-            this->data_to_save += header;
-            this->data_header_received = true;
-        }
-        QString row = msec + ",";
-        for (QString s: values) {
-            QStringList data_el = s.trimmed().split(" ");
-            if (data_el.count() == 2) {
-                row += data_el.at(1) + ",";
-            }
-        }
-        row += "\r\n";
+        QString row = QString::number(time_sec) + "," + received_values.join(",") + "\r\n";
         this->data_to_save += row;
     }
 
     this->appendRow(this->ui->dataPlainTextEdit, data_string.trimmed());
-    this->appendRow(this->ui->timePlainTextEdit, msec);
+    this->appendRow(this->ui->timePlainTextEdit, QString::number(time_sec));
+    this->datachart->addPoints(time_sec, received_values);
 }
 
 void MainWindow::resetRecording()
@@ -130,7 +118,6 @@ void MainWindow::resetRecording()
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->data_to_save = "";
     this->ui->recordButton->setText("Start record");
-
     this->data_header_received = false;
 }
 
@@ -141,11 +128,11 @@ void MainWindow::startStopRecording()
         this->ui->dataPlainTextEdit->clear();
         this->ui->timePlainTextEdit->clear();
         this->recording_started = true;
-
+        this->data_header_received = false;
     } else {
         this->recording_started = false;
         this->appendRow(this->ui->dataPlainTextEdit, "-----------recording end-------------");
-        this->appendRow(this->ui->timePlainTextEdit, "-r end-");
+        this->appendRow(this->ui->timePlainTextEdit, "--r end--");
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                                    "experiment",
                                    tr("CSV as .txt (*.txt)"));
@@ -158,7 +145,6 @@ void MainWindow::startStopRecording()
 
             QTextStream out(&file);
             out << this->data_to_save;
-
         }
         this->resetRecording();
     }
@@ -171,7 +157,31 @@ void MainWindow::appendRow(QPlainTextEdit *edit, const QString &text)
     bar->setValue(bar->maximum());
 }
 
+void MainWindow::initChart()
+{
+    this->datachart->setTitle("Data");
+    this->datachart->legend()->hide();
+    this->datachart->setAnimationOptions(QChart::AllAnimations);
+    this->ui->chartGraphicsView->setChart(this->datachart);
+//    this->ui->chartGraphicsView->set
+    this->ui->chartGraphicsView->setRenderHint(QPainter::Antialiasing, true);
+}
 
-
+QStringList MainWindow::getEntriesAt(const QString &data_string,
+                                     int data_position,
+                                     int data_length,
+                                     QString data_sep,
+                                     QString entry_sep)
+{
+    QStringList entries = data_string.split(data_sep);
+    QStringList values;
+    for (QString entry: entries) {
+        QStringList data_el = entry.trimmed().split(entry_sep);
+        if (data_el.count() == data_length) {
+            values.append(data_el.at(data_position));
+        }
+    }
+    return values;
+}
 
 
