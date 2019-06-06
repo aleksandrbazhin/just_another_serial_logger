@@ -15,4 +15,5 @@ Roadmap:
 - add settings for different serial connection parameters
 - add builds for differnet systems
 
+If you are looking for binaries check releases.
 If you are interested in some functionality, make an issue!
