@@ -2,7 +2,6 @@
 #include <QtCharts/QAbstractAxis>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
-#include <QDebug>
 
 
 DataChart::DataChart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
@@ -44,7 +43,6 @@ void DataChart::initGraph(const QStringList &legend)
 
 void DataChart::addPoints(qreal time, const QStringList &points)
 {
-    qDebug() << points;
     if (this->chart_series.length() != points.length()) {
         return;
     }
