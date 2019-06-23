@@ -68,12 +68,15 @@ height:16px;
            </widget>
           </item>
           <item row="2" column="4">
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="resetUIButton">
             <property name="minimumSize">
              <size>
               <width>100</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Reset UI</string>
@@ -81,7 +84,7 @@ height:16px;
            </widget>
           </item>
           <item row="0" column="4">
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="settingsButton">
             <property name="minimumSize">
              <size>
               <width>100</width>
@@ -192,6 +195,9 @@ height:16px;
             <pointsize>9</pointsize>
            </font>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::ClickFocus</enum>
+          </property>
           <property name="textInteractionFlags">
            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
           </property>
@@ -213,6 +219,9 @@ height:16px;
             <family>Consolas</family>
             <pointsize>9</pointsize>
            </font>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::ClickFocus</enum>
           </property>
           <property name="acceptDrops">
            <bool>false</bool>
@@ -317,6 +326,9 @@ height:16px;
          <verstretch>1</verstretch>
         </sizepolicy>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
        <property name="styleSheet">
         <string notr="true">border:1px solid #acacac;</string>
        </property>
@@ -335,6 +347,19 @@ height:16px;
    <header>QtCharts</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>portComboBox</tabstop>
+  <tabstop>baudComboBox</tabstop>
+  <tabstop>connectButton</tabstop>
+  <tabstop>sendLineEdit</tabstop>
+  <tabstop>sendtButton</tabstop>
+  <tabstop>resetUIButton</tabstop>
+  <tabstop>dataPlainTextEdit</tabstop>
+  <tabstop>timePlainTextEdit</tabstop>
+  <tabstop>recordButton</tabstop>
+  <tabstop>chartGraphicsView</tabstop>
+  <tabstop>settingsButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
