@@ -29,6 +29,8 @@ private slots:
     void handleSerialError(QSerialPort::SerialPortError error);
     void discoverPorts();
     void resetUI();
+    void scrollRaw(int to);
+    void scrollParsed(int to);
 
 private:
     bool openSerialPort();

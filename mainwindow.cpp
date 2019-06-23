@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ui->connectButton, &QPushButton::pressed, this, &MainWindow::handleConnectButton);
     connect(this->ui->recordButton, &QPushButton::pressed, this, &MainWindow::startStopRecording);
     connect(this->ui->resetUIButton, &QPushButton::pressed, this, &MainWindow::resetUI);
+    connect(this->ui->parsedPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollRaw(int)));
+    connect(this->ui->rawPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollParsed(int)));
 
     connect(this->serial, &QSerialPort::errorOccurred, this, &MainWindow::handleSerialError);
     connect(this->serial, &QSerialPort::readyRead, this, &MainWindow::readData);
@@ -150,6 +152,16 @@ void MainWindow::resetUI()
     this->ui->parsedPlainTextEdit->clear();
     this->ui->chartGraphicsView->chart()->resetMatrix();
     this->ui->chartGraphicsView->chart()->resetTransform();
+}
+
+void MainWindow::scrollRaw(int to)
+{
+    this->ui->rawPlainTextEdit->verticalScrollBar()->setValue(to);
+}
+
+void MainWindow::scrollParsed(int to)
+{
+    this->ui->rawPlainTextEdit->verticalScrollBar()->setValue(to);
 }
 
 void MainWindow::resetRecording()
