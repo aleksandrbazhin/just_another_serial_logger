@@ -27,7 +27,7 @@ private slots:
     void handleConnectButton();
     void disconnectUiUpdate();
     void handleSerialError(QSerialPort::SerialPortError error);
-
+    void discoverPorts();
 
 private:
     bool openSerialPort();

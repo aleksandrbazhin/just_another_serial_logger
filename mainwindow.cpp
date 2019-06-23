@@ -1,5 +1,3 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -7,6 +5,9 @@
 #include <QSerialPortInfo>
 #include <QTextStream>
 #include <QDebug>
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "portscombobox.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,11 +17,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     this->ui->setupUi(this);
     this->initChart();
+    this->discoverPorts();
 
-    foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
-        this->ui->portComboBox->addItem(serialPortInfo.portName());
-    }
-
+    connect(this->ui->portComboBox, SIGNAL(popupShowed()), this, SLOT(discoverPorts()));
     connect(this->ui->connectButton, &QPushButton::pressed, this, &MainWindow::handleConnectButton);
     connect(this->ui->recordButton, &QPushButton::pressed, this, &MainWindow::startStopRecording);
 
@@ -42,7 +41,6 @@ void MainWindow::handleConnectButton()
         }
     } else {
         this->closeSerialPort();
-//        this->disconnectUiUpdate();
     }
 }
 
@@ -92,9 +90,16 @@ void MainWindow::disconnectUiUpdate()
 
 void MainWindow::handleSerialError(QSerialPort::SerialPortError error)
 {
-    qDebug() << error;
     if (error == QSerialPort::ResourceError) {
         this->closeSerialPort();
+    }
+}
+
+void MainWindow::discoverPorts()
+{
+    this->ui->portComboBox->clear();
+    foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
+        this->ui->portComboBox->addItem(serialPortInfo.portName());
     }
 }
 
