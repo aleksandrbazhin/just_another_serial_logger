@@ -5,6 +5,7 @@
 #include <QSerialPortInfo>
 #include <QTextStream>
 #include <QDebug>
+#include <QStringBuilder>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "portscombobox.h"
@@ -77,7 +78,7 @@ void MainWindow::connectUiUpdate()
     this->ui->recordButton->setEnabled(true);
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->appendRow(this->ui->rawPlainTextEdit, "-------------connect--------------");
-    this->appendRow(this->ui->parsedPlainTextEdit, "-------------connect--------------");
+    this->appendRow(this->ui->parsedPlainTextEdit, "");
 }
 
 void MainWindow::disconnectUiUpdate()
@@ -90,7 +91,7 @@ void MainWindow::disconnectUiUpdate()
         this->startStopRecording();
     }
     this->appendRow(this->ui->rawPlainTextEdit, "------------disconnect--------------");
-    this->appendRow(this->ui->parsedPlainTextEdit, "------------disconnect--------------");
+    this->appendRow(this->ui->parsedPlainTextEdit, "");
 }
 
 void MainWindow::handleSerialError(QSerialPort::SerialPortError error)
@@ -125,8 +126,11 @@ void MainWindow::readData()
     if (!this->data_header_received)  {
         this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
         QStringList received_headers = this->getEntriesAt(data_string, 0);
-        QString header = "time," + received_headers.join(",") + "\r\n";
-        this->data_to_save += header;
+        QString header = "time," % received_headers.join(",");
+        this->appendRow(this->ui->rawPlainTextEdit, "-----------headers parsed-----------");
+        this->appendRow(this->ui->parsedPlainTextEdit, header);
+
+        this->data_to_save = this->data_to_save % header % "\r\n";
         this->data_header_received = true;
         this->datachart->initGraph(received_headers);
     }
@@ -135,13 +139,13 @@ void MainWindow::readData()
             (QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0;
     QStringList received_values = this->getEntriesAt(data_string, 1);
 
+    QString row = QString::number(time_sec) % "," % received_values.join(",");
+    this->appendRow(this->ui->rawPlainTextEdit, data_string.trimmed());
+    this->appendRow(this->ui->parsedPlainTextEdit, row);
     if (this->recording_started) {
-        QString row = QString::number(time_sec) + "," + received_values.join(",") + "\r\n";
-        this->data_to_save += row;
+        this->data_to_save = this->data_to_save % row % "\r\n";
     }
 
-    this->appendRow(this->ui->rawPlainTextEdit, data_string.trimmed());
-    this->appendRow(this->ui->parsedPlainTextEdit, QString::number(time_sec));
     this->datachart->addPoints(time_sec, received_values);
 }
 
@@ -161,7 +165,7 @@ void MainWindow::scrollRaw(int to)
 
 void MainWindow::scrollParsed(int to)
 {
-    this->ui->rawPlainTextEdit->verticalScrollBar()->setValue(to);
+    this->ui->parsedPlainTextEdit->verticalScrollBar()->setValue(to);
 }
 
 void MainWindow::resetRecording()
