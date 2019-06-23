@@ -23,10 +23,16 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private:
+private slots:
     void handleConnectButton();
+    void disconnectUiUpdate();
+    void handleSerialError(QSerialPort::SerialPortError error);
+
+
+private:
     bool openSerialPort();
     void closeSerialPort();
+    void connectUiUpdate();
     void readData();
     void resetRecording();
     void startStopRecording();

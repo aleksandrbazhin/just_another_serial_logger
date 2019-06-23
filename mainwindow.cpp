@@ -23,7 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(this->ui->connectButton, &QPushButton::pressed, this, &MainWindow::handleConnectButton);
     connect(this->ui->recordButton, &QPushButton::pressed, this, &MainWindow::startStopRecording);
+
+    connect(this->serial, &QSerialPort::errorOccurred, this, &MainWindow::handleSerialError);
     connect(this->serial, &QSerialPort::readyRead, this, &MainWindow::readData);
+    connect(this->serial, &QSerialPort::aboutToClose, this, &MainWindow::disconnectUiUpdate);
 }
 
 MainWindow::~MainWindow()
@@ -35,24 +38,11 @@ void MainWindow::handleConnectButton()
 {
     if (!this->serial_connected) {
         if (this->openSerialPort()) {
-            this->ui->connectButton->setText("Disconnect");
-            this->serial_connected = true;
-//            this->ui->sendLineEdit->setEnabled(true);
-            this->ui->recordButton->setEnabled(true);
-            this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
-            this->appendRow(this->ui->dataPlainTextEdit, "-------------connect--------------");
-            this->appendRow(this->ui->timePlainTextEdit, "-connect-");
+            this->connectUiUpdate();
         }
     } else {
-        this->ui->connectButton->setText("Connect");
-        this->serial_connected = false;
-//        this->ui->sendLineEdit->setEnabled(false);
         this->closeSerialPort();
-        this->ui->recordButton->setEnabled(false);
-        this->recording_started = false;
-        this->resetRecording();
-        this->appendRow(this->ui->dataPlainTextEdit, "------------disconnect--------------");
-        this->appendRow(this->ui->timePlainTextEdit, "disconnect");
+//        this->disconnectUiUpdate();
     }
 }
 
@@ -75,6 +65,37 @@ void MainWindow::closeSerialPort()
 {
     if (this->serial->isOpen())
         this->serial->close();
+}
+
+void MainWindow::connectUiUpdate()
+{
+    this->ui->connectButton->setText("Disconnect");
+    this->serial_connected = true;
+//            this->ui->sendLineEdit->setEnabled(true);
+    this->ui->recordButton->setEnabled(true);
+    this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
+    this->appendRow(this->ui->dataPlainTextEdit, "-------------connect--------------");
+    this->appendRow(this->ui->timePlainTextEdit, "-connect-");
+}
+
+void MainWindow::disconnectUiUpdate()
+{
+    this->ui->connectButton->setText("Connect");
+    this->serial_connected = false;
+//        this->ui->sendLineEdit->setEnabled(false);
+    this->ui->recordButton->setEnabled(false);
+    this->recording_started = false;
+    this->resetRecording();
+    this->appendRow(this->ui->dataPlainTextEdit, "------------disconnect--------------");
+    this->appendRow(this->ui->timePlainTextEdit, "disconnect");
+}
+
+void MainWindow::handleSerialError(QSerialPort::SerialPortError error)
+{
+    qDebug() << error;
+    if (error == QSerialPort::ResourceError) {
+        this->closeSerialPort();
+    }
 }
 
 void MainWindow::readData()
@@ -163,7 +184,6 @@ void MainWindow::initChart()
     this->datachart->legend()->hide();
     this->datachart->setAnimationOptions(QChart::AllAnimations);
     this->ui->chartGraphicsView->setChart(this->datachart);
-//    this->ui->chartGraphicsView->set
     this->ui->chartGraphicsView->setRenderHint(QPainter::Antialiasing, true);
 }
 
