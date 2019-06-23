@@ -32,7 +32,8 @@ SOURCES += \
 
 HEADERS += \
         datachart.h \
-        mainwindow.h
+        mainwindow.h \
+        portscombobox.h
 
 FORMS += \
         mainwindow.ui

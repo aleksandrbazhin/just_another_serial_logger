@@ -38,7 +38,7 @@ height:16px;
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QComboBox" name="portComboBox">
+           <widget class="PortsComboBox" name="portComboBox">
             <property name="minimumSize">
              <size>
               <width>100</width>
@@ -345,6 +345,11 @@ height:16px;
    <class>QChartView</class>
    <extends>QGraphicsView</extends>
    <header>QtCharts</header>
+  </customwidget>
+  <customwidget>
+   <class>PortsComboBox</class>
+   <extends>QComboBox</extends>
+   <header>portscombobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
