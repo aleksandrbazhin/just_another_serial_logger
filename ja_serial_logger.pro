@@ -41,3 +41,11 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resourses.qrc
+
+DISTFILES += \
+    images/drag-icon.png \
+    ja_serial_logger.rc \
+    jasl.ico
