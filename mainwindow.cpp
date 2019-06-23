@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ui->portComboBox, SIGNAL(popupShowed()), this, SLOT(discoverPorts()));
     connect(this->ui->connectButton, &QPushButton::pressed, this, &MainWindow::handleConnectButton);
     connect(this->ui->recordButton, &QPushButton::pressed, this, &MainWindow::startStopRecording);
+    connect(this->ui->resetUIButton, &QPushButton::pressed, this, &MainWindow::resetUI);
 
     connect(this->serial, &QSerialPort::errorOccurred, this, &MainWindow::handleSerialError);
     connect(this->serial, &QSerialPort::readyRead, this, &MainWindow::readData);
@@ -40,6 +41,7 @@ void MainWindow::handleConnectButton()
             this->connectUiUpdate();
         }
     } else {
+        this->data_header_received = false;
         this->closeSerialPort();
     }
 }
@@ -72,8 +74,8 @@ void MainWindow::connectUiUpdate()
 //            this->ui->sendLineEdit->setEnabled(true);
     this->ui->recordButton->setEnabled(true);
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
-    this->appendRow(this->ui->dataPlainTextEdit, "-------------connect--------------");
-    this->appendRow(this->ui->timePlainTextEdit, "-connect-");
+    this->appendRow(this->ui->rawPlainTextEdit, "-------------connect--------------");
+    this->appendRow(this->ui->parsedPlainTextEdit, "-------------connect--------------");
 }
 
 void MainWindow::disconnectUiUpdate()
@@ -82,10 +84,11 @@ void MainWindow::disconnectUiUpdate()
     this->serial_connected = false;
 //        this->ui->sendLineEdit->setEnabled(false);
     this->ui->recordButton->setEnabled(false);
-    this->recording_started = false;
-    this->resetRecording();
-    this->appendRow(this->ui->dataPlainTextEdit, "------------disconnect--------------");
-    this->appendRow(this->ui->timePlainTextEdit, "disconnect");
+    if (this->recording_started) {
+        this->startStopRecording();
+    }
+    this->appendRow(this->ui->rawPlainTextEdit, "------------disconnect--------------");
+    this->appendRow(this->ui->parsedPlainTextEdit, "------------disconnect--------------");
 }
 
 void MainWindow::handleSerialError(QSerialPort::SerialPortError error)
@@ -102,6 +105,7 @@ void MainWindow::discoverPorts()
         this->ui->portComboBox->addItem(serialPortInfo.portName());
     }
 }
+
 
 void MainWindow::readData()
 {
@@ -134,45 +138,42 @@ void MainWindow::readData()
         this->data_to_save += row;
     }
 
-    this->appendRow(this->ui->dataPlainTextEdit, data_string.trimmed());
-    this->appendRow(this->ui->timePlainTextEdit, QString::number(time_sec));
+    this->appendRow(this->ui->rawPlainTextEdit, data_string.trimmed());
+    this->appendRow(this->ui->parsedPlainTextEdit, QString::number(time_sec));
     this->datachart->addPoints(time_sec, received_values);
+}
+
+
+void MainWindow::resetUI()
+{
+    this->ui->rawPlainTextEdit->clear();
+    this->ui->parsedPlainTextEdit->clear();
+    this->ui->chartGraphicsView->chart()->resetMatrix();
+    this->ui->chartGraphicsView->chart()->resetTransform();
 }
 
 void MainWindow::resetRecording()
 {
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->data_to_save = "";
-    this->ui->recordButton->setText("Start record");
     this->data_header_received = false;
 }
 
 void MainWindow::startStopRecording()
 {
     if (!this->recording_started) {
-        this->ui->recordButton->setText("Stop and save");
-        this->ui->dataPlainTextEdit->clear();
-        this->ui->timePlainTextEdit->clear();
         this->recording_started = true;
-        this->data_header_received = false;
-    } else {
-        this->recording_started = false;
-        this->appendRow(this->ui->dataPlainTextEdit, "-----------recording end-------------");
-        this->appendRow(this->ui->timePlainTextEdit, "--r end--");
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
-                                   "experiment",
-                                   tr("CSV as .txt (*.txt)"));
-        if (!fileName.isEmpty()) {
-            QFile file(fileName);
-            if (!file.open(QIODevice::WriteOnly)) {
-                QMessageBox::information(this, tr("Unable to open file"),
-                    file.errorString());
-            }
-
-            QTextStream out(&file);
-            out << this->data_to_save;
-        }
+        this->resetUI();
         this->resetRecording();
+        this->ui->recordButton->setText("Stop and save");
+    } else {
+        this->saveRecorded();
+        this->recording_started = false;
+//        this->appendRow(this->ui->rawPlainTextEdit, "-----------recording end-------------");
+//        this->appendRow(this->ui->parsedPlainTextEdit, "-----------recording end------------");
+
+        this->resetUI();
+        this->ui->recordButton->setText("Start record");
     }
 }
 
@@ -190,6 +191,23 @@ void MainWindow::initChart()
     this->datachart->setAnimationOptions(QChart::AllAnimations);
     this->ui->chartGraphicsView->setChart(this->datachart);
     this->ui->chartGraphicsView->setRenderHint(QPainter::Antialiasing, true);
+}
+
+void MainWindow::saveRecorded()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                               "experiment",
+                               tr("CSV as .txt (*.txt)"));
+    if (!fileName.isEmpty()) {
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(this, tr("Unable to open file"),
+                file.errorString());
+        }
+
+        QTextStream out(&file);
+        out << this->data_to_save;
+    }
 }
 
 QStringList MainWindow::getEntriesAt(const QString &data_string,

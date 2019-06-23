@@ -28,6 +28,7 @@ private slots:
     void disconnectUiUpdate();
     void handleSerialError(QSerialPort::SerialPortError error);
     void discoverPorts();
+    void resetUI();
 
 private:
     bool openSerialPort();
@@ -38,6 +39,7 @@ private:
     void startStopRecording();
     void appendRow(QPlainTextEdit *edit, const QString &text);
     void initChart();
+    void saveRecorded();
 
     QStringList getEntriesAt(const QString &data_string,
                              int data_position = 1,

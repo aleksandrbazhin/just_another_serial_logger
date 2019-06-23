@@ -29,7 +29,7 @@ height:16px;
       <widget class="QWidget" name="layoutWidget">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0" colspan="4">
-         <layout class="QGridLayout" name="gridLayout">
+         <layout class="QGridLayout" name="headerGridLayout">
           <item row="0" column="1" alignment="Qt::AlignBottom">
            <widget class="QLabel" name="baudLabel">
             <property name="text">
@@ -182,7 +182,7 @@ height:16px;
          </widget>
         </item>
         <item row="2" column="0" colspan="2">
-         <widget class="QPlainTextEdit" name="dataPlainTextEdit">
+         <widget class="QPlainTextEdit" name="rawPlainTextEdit">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -204,7 +204,7 @@ height:16px;
          </widget>
         </item>
         <item row="2" column="2" colspan="2">
-         <widget class="QPlainTextEdit" name="timePlainTextEdit">
+         <widget class="QPlainTextEdit" name="parsedPlainTextEdit">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -359,8 +359,8 @@ height:16px;
   <tabstop>sendLineEdit</tabstop>
   <tabstop>sendtButton</tabstop>
   <tabstop>resetUIButton</tabstop>
-  <tabstop>dataPlainTextEdit</tabstop>
-  <tabstop>timePlainTextEdit</tabstop>
+  <tabstop>rawPlainTextEdit</tabstop>
+  <tabstop>parsedPlainTextEdit</tabstop>
   <tabstop>recordButton</tabstop>
   <tabstop>chartGraphicsView</tabstop>
   <tabstop>settingsButton</tabstop>
