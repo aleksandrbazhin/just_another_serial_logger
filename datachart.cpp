@@ -13,6 +13,10 @@ DataChart::DataChart(QWidget *parent):
     QCPTextElement *title = new QCPTextElement(this->plot,
                                 "Parsed data", QFont("sans", 10));
     this->plot->plotLayout()->addElement(0, 0, title);
+
+    QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
+    timeTicker->setTimeFormat("%m:%s");
+    this->plot->xAxis->setTicker(timeTicker);
 }
 
 DataChart::~DataChart()
@@ -35,6 +39,7 @@ void DataChart::initGraph(const QStringList &legend)
     }
     this->plot->legend->setVisible(true);
     this->plot->xAxis->setRange(0, this->max_x, Qt::AlignRight);
+
 }
 
 void DataChart::addPoints(double time, const QStringList &points)
