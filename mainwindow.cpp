@@ -10,32 +10,44 @@
 #include "ui_mainwindow.h"
 #include "portscombobox.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    serial(new QSerialPort(this)),
-    datachart(new DataChart)
+    serial(new QSerialPort(this))
 {
     this->ui->setupUi(this);
-    this->initChart();
+
     this->discoverPorts();
 
-    connect(this->ui->portComboBox, SIGNAL(popupShowed()), this, SLOT(discoverPorts()));
-    connect(this->ui->connectButton, &QPushButton::pressed, this, &MainWindow::handleConnectButton);
-    connect(this->ui->recordButton, &QPushButton::pressed, this, &MainWindow::startStopRecording);
-    connect(this->ui->resetUIButton, &QPushButton::pressed, this, &MainWindow::resetUI);
-    connect(this->ui->parsedPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollRaw(int)));
-    connect(this->ui->rawPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(scrollParsed(int)));
+    connect(this->ui->portComboBox, SIGNAL(popupShowed()),
+            this, SLOT(discoverPorts()));
+    connect(this->ui->connectButton, &QPushButton::pressed,
+            this, &MainWindow::handleConnectButton);
+    connect(this->ui->recordButton, &QPushButton::pressed,
+            this, &MainWindow::startStopRecording);
+    connect(this->ui->resetUIButton, &QPushButton::pressed,
+            this, &MainWindow::resetUI);
+    connect(this->ui->parsedPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
+            this, SLOT(scrollRaw(int)));
+    connect(this->ui->rawPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
+            this, SLOT(scrollParsed(int)));
 
-    connect(this->serial, &QSerialPort::errorOccurred, this, &MainWindow::handleSerialError);
-    connect(this->serial, &QSerialPort::readyRead, this, &MainWindow::readData);
-    connect(this->serial, &QSerialPort::aboutToClose, this, &MainWindow::disconnectUiUpdate);
+    connect(this->serial, &QSerialPort::errorOccurred,
+            this, &MainWindow::handleSerialError);
+    connect(this->serial, &QSerialPort::readyRead,
+            this, &MainWindow::readData);
+    connect(this->serial, &QSerialPort::aboutToClose,
+            this, &MainWindow::disconnectUiUpdate);
+
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 
 void MainWindow::handleConnectButton()
 {
@@ -48,6 +60,7 @@ void MainWindow::handleConnectButton()
         this->closeSerialPort();
     }
 }
+
 
 bool MainWindow::openSerialPort()
 {
@@ -64,28 +77,31 @@ bool MainWindow::openSerialPort()
     }
 }
 
+
 void MainWindow::closeSerialPort()
 {
     if (this->serial->isOpen())
         this->serial->close();
 }
 
+
 void MainWindow::connectUiUpdate()
 {
     this->ui->connectButton->setText("Disconnect");
     this->serial_connected = true;
-//            this->ui->sendLineEdit->setEnabled(true);
+//    this->ui->sendLineEdit->setEnabled(true);
     this->ui->recordButton->setEnabled(true);
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->appendRow(this->ui->rawPlainTextEdit, "-------------connect--------------");
     this->appendRow(this->ui->parsedPlainTextEdit, "");
 }
 
+
 void MainWindow::disconnectUiUpdate()
 {
     this->ui->connectButton->setText("Connect");
     this->serial_connected = false;
-//        this->ui->sendLineEdit->setEnabled(false);
+//    this->ui->sendLineEdit->setEnabled(false);
     this->ui->recordButton->setEnabled(false);
     if (this->recording_started) {
         this->startStopRecording();
@@ -94,12 +110,14 @@ void MainWindow::disconnectUiUpdate()
     this->appendRow(this->ui->parsedPlainTextEdit, "");
 }
 
+
 void MainWindow::handleSerialError(QSerialPort::SerialPortError error)
 {
     if (error == QSerialPort::ResourceError) {
         this->closeSerialPort();
     }
 }
+
 
 void MainWindow::discoverPorts()
 {
@@ -132,7 +150,7 @@ void MainWindow::readData()
 
         this->data_to_save = this->data_to_save % header % "\r\n";
         this->data_header_received = true;
-        this->datachart->initGraph(received_headers);
+        this->ui->dataPlot->initGraph(received_headers);
     }
 
     qreal time_sec =
@@ -145,8 +163,8 @@ void MainWindow::readData()
     if (this->recording_started) {
         this->data_to_save = this->data_to_save % row % "\r\n";
     }
+    this->ui->dataPlot->addPoints(time_sec, received_values);
 
-    this->datachart->addPoints(time_sec, received_values);
 }
 
 
@@ -154,8 +172,8 @@ void MainWindow::resetUI()
 {
     this->ui->rawPlainTextEdit->clear();
     this->ui->parsedPlainTextEdit->clear();
-    this->ui->chartGraphicsView->chart()->resetMatrix();
-    this->ui->chartGraphicsView->chart()->resetTransform();
+    this->ui->dataPlot->cleanup();
+
 }
 
 void MainWindow::scrollRaw(int to)
@@ -185,10 +203,7 @@ void MainWindow::startStopRecording()
     } else {
         this->saveRecorded();
         this->recording_started = false;
-//        this->appendRow(this->ui->rawPlainTextEdit, "-----------recording end-------------");
-//        this->appendRow(this->ui->parsedPlainTextEdit, "-----------recording end------------");
-
-        this->resetUI();
+//        this->resetUI();
         this->ui->recordButton->setText("Start record");
     }
 }
@@ -198,15 +213,6 @@ void MainWindow::appendRow(QPlainTextEdit *edit, const QString &text)
     edit->appendPlainText(text);
     QScrollBar *bar = edit->verticalScrollBar();
     bar->setValue(bar->maximum());
-}
-
-void MainWindow::initChart()
-{
-    this->datachart->setTitle("Data");
-    this->datachart->legend()->hide();
-    this->datachart->setAnimationOptions(QChart::AllAnimations);
-    this->ui->chartGraphicsView->setChart(this->datachart);
-    this->ui->chartGraphicsView->setRenderHint(QPainter::Antialiasing, true);
 }
 
 void MainWindow::saveRecorded()

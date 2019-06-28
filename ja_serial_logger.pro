@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport charts
+QT       += core gui serialport charts printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,12 +28,14 @@ RC_FILE = ja_serial_logger.rc
 SOURCES += \
         datachart.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        qcustomplot.cpp
 
 HEADERS += \
         datachart.h \
         mainwindow.h \
-        portscombobox.h
+        portscombobox.h \
+        qcustomplot.h
 
 FORMS += \
         mainwindow.ui

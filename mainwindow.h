@@ -40,7 +40,6 @@ private:
     void resetRecording();
     void startStopRecording();
     void appendRow(QPlainTextEdit *edit, const QString &text);
-    void initChart();
     void saveRecorded();
 
     QStringList getEntriesAt(const QString &data_string,
@@ -57,7 +56,7 @@ private:
     bool data_header_received = false;
     QString temp_receive = "";
     QString data_to_save = "";
-    DataChart *datachart;
+//    DataChart *datachart;
 
 };
 
