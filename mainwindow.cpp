@@ -142,6 +142,15 @@ void MainWindow::readData()
     }
 
     if (!this->data_header_received)  {
+
+        // throw away first received row to make sure we don't have garbage data in headers
+        // the dirty way
+        if (this->throw_away_first && !this->thrown_first_away) {
+            this->thrown_first_away = true;
+            return;
+        }
+        this->thrown_first_away = false;
+
         this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
         QStringList received_headers = this->getEntriesAt(data_string, 0);
         QString header = "time," % received_headers.join(",");
@@ -149,14 +158,13 @@ void MainWindow::readData()
         this->appendRow(this->ui->parsedPlainTextEdit, header);
 
         this->data_to_save = this->data_to_save % header % "\r\n";
-        this->data_header_received = true;
         this->ui->dataPlot->initGraph(received_headers);
+        this->data_header_received = true;
     }
 
     qreal time_sec =
             (QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0;
     QStringList received_values = this->getEntriesAt(data_string, 1);
-
     QString row = QString::number(time_sec) % "," % received_values.join(",");
     this->appendRow(this->ui->rawPlainTextEdit, data_string.trimmed());
     this->appendRow(this->ui->parsedPlainTextEdit, row);
