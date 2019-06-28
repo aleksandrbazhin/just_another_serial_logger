@@ -25,14 +25,16 @@ void DataChart::initGraph(const QStringList &legend)
 {
     this->plot->clearGraphs();
     for (QString title: legend) {
-        this->plot->addGraph(); // blue line
+        this->plot->addGraph();
     }
     for (int i = 0; i < this->plot->graphCount(); i++) {
-        this->plot->graph(i)->setPen(
-                    QPen(QBrush(this->colors[i % this->colors.length()]), 2.0));
+            this->plot->graph(i)->setPen(
+                        QPen(this->colors[i % this->colors.length()]));
+
         this->plot->graph(i)->setName(legend[i]);
     }
     this->plot->legend->setVisible(true);
+    this->plot->xAxis->setRange(0, this->max_x, Qt::AlignRight);
 }
 
 void DataChart::addPoints(double time, const QStringList &points)
@@ -47,7 +49,7 @@ void DataChart::addPoints(double time, const QStringList &points)
             this->plot->graph(i)->addData(time, y);
         }
         this->plot->xAxis->setRange(time,
-                            this->max_x > time ? this->max_x : time, Qt::AlignRight);
+                                    this->max_x > time ? this->max_x : time, Qt::AlignRight);
         this->plot->replot();
     }
 }
