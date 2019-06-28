@@ -56,7 +56,8 @@ private:
     bool data_header_received = false;
     QString temp_receive = "";
     QString data_to_save = "";
-//    DataChart *datachart;
+    bool throw_away_first = true;
+    bool thrown_first_away = false;
 
 };
 
