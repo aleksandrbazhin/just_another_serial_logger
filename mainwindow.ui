@@ -319,18 +319,12 @@ height:16px;
         </item>
        </layout>
       </widget>
-      <widget class="QChartView" name="chartGraphicsView">
+      <widget class="DataChart" name="dataPlot" native="true">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::ClickFocus</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border:1px solid #acacac;</string>
        </property>
       </widget>
      </widget>
@@ -342,14 +336,15 @@ height:16px;
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QChartView</class>
-   <extends>QGraphicsView</extends>
-   <header>QtCharts</header>
-  </customwidget>
-  <customwidget>
    <class>PortsComboBox</class>
    <extends>QComboBox</extends>
    <header>portscombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DataChart</class>
+   <extends>QWidget</extends>
+   <header>datachart.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -362,7 +357,6 @@ height:16px;
   <tabstop>rawPlainTextEdit</tabstop>
   <tabstop>parsedPlainTextEdit</tabstop>
   <tabstop>recordButton</tabstop>
-  <tabstop>chartGraphicsView</tabstop>
   <tabstop>settingsButton</tabstop>
  </tabstops>
  <resources/>
