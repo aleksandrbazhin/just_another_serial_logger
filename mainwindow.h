@@ -33,6 +33,7 @@ private slots:
     void scrollParsed(int to);
 
 private:
+    void initUi();
     bool openSerialPort();
     void closeSerialPort();
     void connectUiUpdate();

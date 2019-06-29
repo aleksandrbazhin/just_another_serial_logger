@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QStringBuilder>
+#include <QListView>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "portscombobox.h"
@@ -17,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     serial(new QSerialPort(this))
 {
     this->ui->setupUi(this);
+    this->initUi();
 
     this->discoverPorts();
 
@@ -93,7 +95,7 @@ void MainWindow::connectUiUpdate()
     this->ui->recordButton->setEnabled(true);
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->appendRow(this->ui->rawPlainTextEdit, "-------------connect--------------");
-    this->appendRow(this->ui->parsedPlainTextEdit, "");
+    this->appendRow(this->ui->parsedPlainTextEdit, " ");
 }
 
 
@@ -107,7 +109,7 @@ void MainWindow::disconnectUiUpdate()
         this->startStopRecording();
     }
     this->appendRow(this->ui->rawPlainTextEdit, "------------disconnect--------------");
-    this->appendRow(this->ui->parsedPlainTextEdit, "");
+    this->appendRow(this->ui->parsedPlainTextEdit, " ");
 }
 
 
@@ -192,6 +194,12 @@ void MainWindow::scrollRaw(int to)
 void MainWindow::scrollParsed(int to)
 {
     this->ui->parsedPlainTextEdit->verticalScrollBar()->setValue(to);
+}
+
+void MainWindow::initUi()
+{
+    ui->portComboBox->setItemDelegate(new QStyledItemDelegate());
+    ui->baudComboBox->setItemDelegate(new QStyledItemDelegate());
 }
 
 void MainWindow::resetRecording()
