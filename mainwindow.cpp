@@ -72,6 +72,7 @@ bool MainWindow::openSerialPort()
     this->serial->setParity(QSerialPort::NoParity);
     this->serial->setStopBits(QSerialPort::OneStop);
     if (this->serial->open(QIODevice::ReadWrite)) {
+        serial->setDataTerminalReady(true);
         return true;
     } else {
         QMessageBox::critical(this, tr("Error"), this->serial->errorString());
@@ -132,7 +133,7 @@ void MainWindow::discoverPorts()
 
 void MainWindow::readData()
 {
-    char data[256];
+    char data[1024];
     this->serial->readLine(data, sizeof(data));
     QString data_string(data);
     if (!data_string.endsWith("\n")) {
