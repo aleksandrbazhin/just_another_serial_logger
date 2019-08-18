@@ -5,6 +5,11 @@
 #include <QStringList>
 #include "thirdparty/qcustomplot.h"
 
+enum PlotPolicy {
+    frame,
+    append
+};
+
 class DataChart : public QWidget
 {
     Q_OBJECT
@@ -13,14 +18,16 @@ class DataChart : public QWidget
         DataChart(QWidget *parent=nullptr);
         ~DataChart();
         void initGraph(const QStringList &legends);
-        void addPoints(double time, const QStringList &points);
+        void addPoints(double time, const QStringList &points,
+                       const PlotPolicy &policy = PlotPolicy::frame);
         void cleanup();
 
     private:
         QSharedPointer<QCPAxisTickerTime> timeTicker;
         QCustomPlot *plot;
         double max_x = 5.0;
-        double max_y = 128.0;
+        double max_y = 5.0;
+
         const QVector<QColor> colors = {
             QColor(57, 106, 177),
             QColor(218, 124, 48),

@@ -42,20 +42,20 @@ void DataChart::initGraph(const QStringList &legend)
 
 }
 
-void DataChart::addPoints(double time, const QStringList &points)
+void DataChart::addPoints(double time, const QStringList &points, const PlotPolicy &policy)
 {
     if (this->plot->graphCount() == points.length()) {
         for (int i = 0; i < points.length(); i++) {
             double y = points[i].toDouble();
-            if (y > this->max_y) {
-                this->max_y = y + 50; // some random number large enough
-                this->plot->yAxis->setRange(this->max_y/2, this->max_y, Qt::AlignBottom);
-            }
             this->plot->graph(i)->addData(time, y);
         }
-        this->plot->xAxis->setRange(time,
-                                    this->max_x > time ? this->max_x : time, Qt::AlignRight);
-        this->plot->replot();
+        double plotXRange = this->max_x;
+        if (policy == PlotPolicy::append) {
+            plotXRange = this->max_x > time ? this->max_x : time;
+        }
+        this->plot->xAxis->setRange(time, plotXRange, Qt::AlignRight);
+        this->plot->yAxis->rescale(true);
+        this->plot->replot(QCustomPlot::rpQueuedReplot);
     }
 }
 
