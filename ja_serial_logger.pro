@@ -29,16 +29,19 @@ SOURCES += \
         datachart.cpp \
         main.cpp \
         mainwindow.cpp \
+        settingsdialog.cpp \
         thirdparty/qcustomplot.cpp
 
 HEADERS += \
         datachart.h \
         mainwindow.h \
         portscombobox.h \
+        settingsdialog.h \
         thirdparty/qcustomplot.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        settingsdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

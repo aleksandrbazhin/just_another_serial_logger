@@ -10,6 +10,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "portscombobox.h"
+#include "settingsdialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -30,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::startStopRecording);
     connect(this->ui->resetUIButton, &QPushButton::pressed,
             this, &MainWindow::resetUI);
+    connect(this->ui->settingsButton, &QPushButton::pressed,
+            this, &showSettingsDialog);
     connect(this->ui->parsedPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
             this, SLOT(scrollRaw(int)));
     connect(this->ui->rawPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
@@ -195,6 +198,14 @@ void MainWindow::scrollRaw(int to)
 void MainWindow::scrollParsed(int to)
 {
     this->ui->parsedPlainTextEdit->verticalScrollBar()->setValue(to);
+}
+
+void MainWindow::showSettingsDialog()
+{
+    SettingsDialog settings_dialog(this);
+    settings_dialog.setModal(true);
+    settings_dialog.exec();
+
 }
 
 void MainWindow::initUi()

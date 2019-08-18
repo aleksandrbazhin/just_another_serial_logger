@@ -31,6 +31,7 @@ private slots:
     void resetUI();
     void scrollRaw(int to);
     void scrollParsed(int to);
+    void showSettingsDialog();
 
 private:
     void initUi();
