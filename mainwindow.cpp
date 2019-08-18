@@ -31,8 +31,10 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::startStopRecording);
     connect(this->ui->resetUIButton, &QPushButton::pressed,
             this, &MainWindow::resetUI);
-    connect(this->ui->settingsButton, &QPushButton::pressed,
-            this, &showSettingsDialog);
+    connect(this->ui->sendButton, &QPushButton::pressed,
+            this, &MainWindow::handleSendButton);
+//    connect(this->ui->settingsButton, &QPushButton::pressed,
+//            this, &showSettingsDialog);
     connect(this->ui->parsedPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
             this, SLOT(scrollRaw(int)));
     connect(this->ui->rawPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
@@ -95,7 +97,8 @@ void MainWindow::connectUiUpdate()
 {
     this->ui->connectButton->setText("Disconnect");
     this->serial_connected = true;
-//    this->ui->sendLineEdit->setEnabled(true);
+    this->ui->sendLineEdit->setEnabled(true);
+    this->ui->sendButton->setEnabled(true);
     this->ui->recordButton->setEnabled(true);
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->appendRow(this->ui->rawPlainTextEdit, "-------------connect--------------");
@@ -107,7 +110,8 @@ void MainWindow::disconnectUiUpdate()
 {
     this->ui->connectButton->setText("Connect");
     this->serial_connected = false;
-//    this->ui->sendLineEdit->setEnabled(false);
+    this->ui->sendLineEdit->setEnabled(false);
+    this->ui->sendButton->setEnabled(false);
     this->ui->recordButton->setEnabled(false);
     if (this->recording_started) {
         this->startStopRecording();
@@ -208,6 +212,12 @@ void MainWindow::showSettingsDialog()
 
 }
 
+void MainWindow::handleSendButton()
+{
+    this->sendDataToPort(this->ui->sendLineEdit->text());
+    this->ui->sendLineEdit->clear();
+}
+
 void MainWindow::initUi()
 {
     ui->portComboBox->setItemDelegate(new QStyledItemDelegate());
@@ -257,6 +267,13 @@ void MainWindow::saveRecorded()
 
         QTextStream out(&file);
         out << this->data_to_save;
+    }
+}
+
+void MainWindow::sendDataToPort(const QString &data_string)
+{
+    if(this->serial_connected) {
+        this->serial->write(data_string.toLatin1());
     }
 }
 

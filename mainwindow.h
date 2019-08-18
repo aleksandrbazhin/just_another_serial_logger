@@ -32,6 +32,7 @@ private slots:
     void scrollRaw(int to);
     void scrollParsed(int to);
     void showSettingsDialog();
+    void handleSendButton();
 
 private:
     void initUi();
@@ -43,6 +44,7 @@ private:
     void startStopRecording();
     void appendRow(QPlainTextEdit *edit, const QString &text);
     void saveRecorded();
+    void sendDataToPort(const QString &data_string);
 
     QStringList getEntriesAt(const QString &data_string,
                              int data_position = 1,

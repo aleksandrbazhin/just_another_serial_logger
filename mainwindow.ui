@@ -234,7 +234,7 @@ QListView::item:selected { color: black; background-color: lightgray}</string>
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QPushButton" name="sendtButton">
+         <widget class="QPushButton" name="sendButton">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -353,7 +353,7 @@ QListView::item:selected { color: black; background-color: lightgray}</string>
   <tabstop>baudComboBox</tabstop>
   <tabstop>connectButton</tabstop>
   <tabstop>sendLineEdit</tabstop>
-  <tabstop>sendtButton</tabstop>
+  <tabstop>sendButton</tabstop>
   <tabstop>rawPlainTextEdit</tabstop>
   <tabstop>parsedPlainTextEdit</tabstop>
   <tabstop>recordButton</tabstop>
