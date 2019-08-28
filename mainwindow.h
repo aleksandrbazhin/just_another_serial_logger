@@ -45,6 +45,9 @@ private:
     void appendRow(QPlainTextEdit *edit, const QString &text);
     void saveRecorded();
     void sendDataToPort(const QString &data_string);
+    void enablePlotScroll();
+    void disablePlotScroll();
+    void updatePlotScrollOnReceive();
 
     QStringList getEntriesAt(const QString &data_string,
                              int data_position = 1,
@@ -62,6 +65,7 @@ private:
     QString data_to_save = "";
     bool throw_away_first = true;
     bool thrown_first_away = false;
+    qreal last_value_time = 0;
 
 };
 

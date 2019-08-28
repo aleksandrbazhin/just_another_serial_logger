@@ -2,6 +2,11 @@
 #include <QDebug>
 #include <QGridLayout>
 
+
+const qreal DataChart::max_x = 5.0;
+const qreal DataChart::max_y = 5.0;
+const qreal DataChart::scroll_scale = 10.0;
+
 DataChart::DataChart(QWidget *parent):
     QWidget(parent),
     plot(new QCustomPlot(this))
@@ -64,4 +69,16 @@ void DataChart::cleanup()
     for (int i = 0; i < this->plot->graphCount(); i++) {
         this->plot->graph(i)->data()->clear();
     }
+}
+
+void DataChart::setHorizontalAxisRange(int value)
+{
+
+}
+
+void DataChart::setHorizontalAxisStart(int value)
+{
+    this->plot->xAxis->setRange(value / DataChart::scroll_scale,
+                                DataChart::max_x, Qt::AlignRight);
+    this->plot->replot();
 }

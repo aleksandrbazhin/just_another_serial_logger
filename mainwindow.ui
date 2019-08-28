@@ -330,6 +330,13 @@ QListView::item:selected { color: black; background-color: lightgray}</string>
       </widget>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QScrollBar" name="plotScrollBar">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>

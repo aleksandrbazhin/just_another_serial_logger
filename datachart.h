@@ -5,6 +5,10 @@
 #include <QStringList>
 #include "thirdparty/qcustomplot.h"
 
+//#define DATACHART_MAX_X 5.0
+//#define DATACHART_MAX_Y 5.0
+//#define DATACHART_SCROLL_SCALE 10.0
+
 enum PlotPolicy {
     frame,
     append
@@ -15,6 +19,9 @@ class DataChart : public QWidget
     Q_OBJECT
 
     public:
+        static const qreal max_x;
+        static const qreal max_y;
+        static const qreal scroll_scale;
         DataChart(QWidget *parent=nullptr);
         ~DataChart();
         void initGraph(const QStringList &legends);
@@ -22,11 +29,15 @@ class DataChart : public QWidget
                        const PlotPolicy &policy = PlotPolicy::frame);
         void cleanup();
 
+    public slots:
+        void setHorizontalAxisRange(int value);
+        void setHorizontalAxisStart(int value);
+
     private:
         QSharedPointer<QCPAxisTickerTime> timeTicker;
         QCustomPlot *plot;
-        double max_x = 5.0;
-        double max_y = 5.0;
+//        const double max_x = DATACHART_MAX_X;
+//        const double max_y = DATACHART_MAX_Y;
 
         const QVector<QColor> colors = {
             QColor(57, 106, 177),
@@ -40,6 +51,6 @@ class DataChart : public QWidget
         };
 };
 
-;
+
 
 #endif // DATACHART_H

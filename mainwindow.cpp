@@ -40,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ui->rawPlainTextEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
             this, SLOT(scrollParsed(int)));
 
+    connect(this->ui->plotScrollBar, SIGNAL(valueChanged(int)),
+            this->ui->dataPlot, SLOT(setHorizontalAxisStart(int)));
+
+
     connect(this->serial, &QSerialPort::errorOccurred,
             this, &MainWindow::handleSerialError);
     connect(this->serial, &QSerialPort::readyRead,
@@ -53,6 +57,13 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+void MainWindow::initUi()
+{
+    this->ui->portComboBox->setItemDelegate(new QStyledItemDelegate());
+    this->ui->baudComboBox->setItemDelegate(new QStyledItemDelegate());
 }
 
 
@@ -103,6 +114,7 @@ void MainWindow::connectUiUpdate()
     this->recording_start_time = QDateTime::currentMSecsSinceEpoch();
     this->appendRow(this->ui->rawPlainTextEdit, "-------------connect--------------");
     this->appendRow(this->ui->parsedPlainTextEdit, " ");
+    this->disablePlotScroll();
 }
 
 
@@ -118,6 +130,7 @@ void MainWindow::disconnectUiUpdate()
     }
     this->appendRow(this->ui->rawPlainTextEdit, "------------disconnect--------------");
     this->appendRow(this->ui->parsedPlainTextEdit, " ");
+    this->enablePlotScroll();
 }
 
 
@@ -172,16 +185,16 @@ void MainWindow::readData()
         this->data_header_received = true;
     }
 
-    qreal time_sec =
+    this->last_value_time =
             (QDateTime::currentMSecsSinceEpoch() - this->recording_start_time) / 1000.0;
     QStringList received_values = this->getEntriesAt(data_string, 1);
-    QString row = QString::number(time_sec) % "," % received_values.join(",");
+    QString row = QString::number(this->last_value_time) % "," % received_values.join(",");
     this->appendRow(this->ui->rawPlainTextEdit, data_string.trimmed());
     this->appendRow(this->ui->parsedPlainTextEdit, row);
     if (this->recording_started) {
         this->data_to_save = this->data_to_save % row % "\r\n";
     }
-    this->ui->dataPlot->addPoints(time_sec, received_values);
+    this->ui->dataPlot->addPoints(this->last_value_time, received_values);
 
 }
 
@@ -216,12 +229,6 @@ void MainWindow::handleSendButton()
 {
     this->sendDataToPort(this->ui->sendLineEdit->text());
     this->ui->sendLineEdit->clear();
-}
-
-void MainWindow::initUi()
-{
-    ui->portComboBox->setItemDelegate(new QStyledItemDelegate());
-    ui->baudComboBox->setItemDelegate(new QStyledItemDelegate());
 }
 
 void MainWindow::resetRecording()
@@ -275,6 +282,27 @@ void MainWindow::sendDataToPort(const QString &data_string)
     if(this->serial_connected) {
         this->serial->write(data_string.toLatin1());
     }
+}
+
+void MainWindow::enablePlotScroll()
+{
+    if (this->last_value_time > DataChart::max_x) {
+        this->ui->plotScrollBar->setEnabled(true);
+        int min_scroll = int(DataChart::max_x * DataChart::scroll_scale);
+        int max_scroll = int(this->last_value_time * DataChart::scroll_scale);
+        this->ui->plotScrollBar->setRange(min_scroll, max_scroll);
+        this->ui->plotScrollBar->setValue(max_scroll);
+    }
+}
+
+void MainWindow::disablePlotScroll()
+{
+    this->ui->plotScrollBar->setEnabled(false);
+}
+
+void MainWindow::updatePlotScrollOnReceive()
+{
+//    this->ui->plotScrollBar;
 }
 
 QStringList MainWindow::getEntriesAt(const QString &data_string,
